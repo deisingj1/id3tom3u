@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		88A721321D12521D002F18E4 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 88A721311D12521D002F18E4 /* main.cpp */; };
+		88A721391D125EA3002F18E4 /* libtag.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 88A721381D125EA3002F18E4 /* libtag.a */; settings = {ATTRIBUTES = (Required, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,6 +26,7 @@
 /* Begin PBXFileReference section */
 		88A7212E1D12521D002F18E4 /* id3tom3u */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = id3tom3u; sourceTree = BUILT_PRODUCTS_DIR; };
 		88A721311D12521D002F18E4 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		88A721381D125EA3002F18E4 /* libtag.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libtag.a; path = "../../../Downloads/taglib-1.11/taglib/libtag.a"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -32,6 +34,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				88A721391D125EA3002F18E4 /* libtag.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -41,6 +44,7 @@
 		88A721251D12521D002F18E4 = {
 			isa = PBXGroup;
 			children = (
+				88A721381D125EA3002F18E4 /* libtag.a */,
 				88A721301D12521D002F18E4 /* id3tom3u */,
 				88A7212F1D12521D002F18E4 /* Products */,
 			);
@@ -202,6 +206,16 @@
 		88A721361D12521D002F18E4 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"/Users/jesse/Downloads/taglib-1.11/taglib",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-I/usr/local/include/",
+				);
+				OTHER_LDFLAGS = "-lz";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -209,6 +223,16 @@
 		88A721371D12521D002F18E4 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"/Users/jesse/Downloads/taglib-1.11/taglib",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-I/usr/local/include/",
+				);
+				OTHER_LDFLAGS = "-lz";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
