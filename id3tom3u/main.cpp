@@ -11,12 +11,24 @@
 #include <taglib/fileref.h>
 #include <dirent.h>
 #include <fstream>
+#include <vector>
+#include <algorithm>
+#include <string.h>
 
 struct args {
     const char * ifName;
     const char * ofName;
     const char * append;
 };
+struct song {
+    char * fName;
+    TagLib::uint trackNo;
+    TagLib::String album;
+    bool operator<(const song& rhs) const {
+        return std::tie(rhs.album,rhs.trackNo) > std::tie(this->album,this->trackNo);
+    }
+};
+const char * ext = ".mp3";
 
 struct args getArgs(int argc, const char * argv[]) {
     struct args a;
@@ -38,24 +50,75 @@ struct args getArgs(int argc, const char * argv[]) {
     }
     return a;
 };
+bool checkSuffix(const char * sarr, std::string suffix) {
+    std::string str(sarr);
+    if (suffix.length() > str.length()) {
+        return true;
+    }
+    std::string strsuffix = str.substr(str.length()-4);
+    //std::cout << strsuffix << std::endl;
+    return strsuffix.compare(ext);
+}
 
-int main(int argc, const char * argv[]) {
-    struct args a = getArgs(argc, argv);
+std::vector<struct song> getFileNames(const char * dirName) {
+    std::vector<struct song> fl;
+    struct song s;
     DIR *dp;
     struct dirent *ep;
-    dp = opendir(a.ifName);
+    dp = opendir(dirName);
     if(dp != NULL) {
-            while ((ep = readdir(dp)))
-            puts(ep->d_name);
+        while ((ep = readdir(dp))) {
+            if(!checkSuffix(ep->d_name,ext)) {
+                s = *new struct song;
+                s.fName = new char[1024];
+                strcpy(s.fName,ep->d_name);
+                char path[1024];
+                std::strcpy(path, dirName);
+                std::strcat(path,s.fName);
+                TagLib::FileRef f(path);
+                s.album = f.tag()->album();
+                s.trackNo = f.tag()->track();
+                fl.push_back(s);
+            }
+        }
         (void) closedir(dp);
     }
     else {
         perror("Couldn't find directory");
     }
-    
-    TagLib::FileRef f("test.mp3");
-    TagLib::String artist = f.tag()->album();
-    TagLib::uint trackno = f.tag()->track();
-    std::cout << artist << " track " << trackno << std::endl;
+    return fl;
+}
+
+void printContents(std::vector<struct song> sl) {
+    for (int i = 0; i < sl.size(); i++) {
+        struct song s = sl.at(i);
+        std::cout << s.fName << " " << s.trackNo <<  " " << s.album << std::endl;
+    }
+}
+void writeLists(std::vector<struct song> sl, const char * append) {
+    TagLib::String currentAlb = sl.at(0).album;
+    std::string outputFile = currentAlb.to8Bit() + ".m3u";
+    std::ofstream output;
+    output.open(outputFile);
+    for (int i = 0; i < sl.size(); i++) {
+        struct song currentSong = sl.at(i);
+        if (currentSong.album.operator!=(currentAlb)) {
+            currentAlb = currentSong.album;
+            std::string outputFile = currentAlb.to8Bit() + ".m3u";
+            output.close();
+            output.open(outputFile);
+        }
+        output << append << currentSong.fName << std::endl;
+        std::cout << currentSong.fName << " " << currentSong.trackNo <<  " " << currentSong.album << std::endl;
+    }
+}
+
+int main(int argc, const char * argv[]) {
+    struct args a = getArgs(argc, argv);
+    std::vector<struct song> songList = getFileNames(a.ifName);
+    //printContents(songList);
+    std::sort(songList.begin(),songList.end());
+    printContents(songList);
+    writeLists(songList,a.append);
     return 0;
 }
